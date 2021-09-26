@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Search Engine</title>
+    <style>
+        body{
+            background: #000;
+            color: white;       
+        }
+        input{
+            width: 300px;
+            height: 25px;
+            border-radius: 8px;
+        }
+        button{
+            width: 130px;
+            height: 25px;
+            border-radius: 8px;
+        }
+        #search{
+            width: 450px;
+            margin: 50px auto 0px;
+        }
+        #container{
+            display: flex;
+            width: 65%;
+            margin: auto;
+        }
+        #container > div {
+            width: 60%;
+            margin: auto;
+        }
+        .err-image{
+            width: 200px;
+            height: 200px;
+            margin: 20px 120px;
+        }
+        .movie-image{
+            width: 300px;
+            height: 400px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <form>
+        <div id="search">
+            <input type="text" placeholder="Enter Movie Name">
+            <button>Search Movie</button>
+        </div>
+        <div id="container">
+
+        </div>
+    </form>
+    <script>
+        window.addEventListener('load', function () {
+            var btn = document.querySelector('button');
+            btn.addEventListener('click', searchMovie)
+        })
+        function searchMovie(e) {
+            const movie = document.querySelector('input').value
+            if(movie === ''){
+                alert('Please enter a movie name to search');
+            }
+            else{
+                searchData(movie);
+                document.querySelector("input").value = ''  
+            }
+            e.preventDefault();
+        }
+        function searchData(movie) {
+            fetch(`http://www.omdbapi.com/?i=tt3896198&apikey=5be517b5&t=${movie}`)
+            .then(function (res) {
+                return res.json()
+            })
+            .then(function (res) {
+                displayMovie(res);
+            })
+            .catch(function (err) {
+                // showError(err);
+            })
+        }
+
+        // function showError(err) {
+        //     var cont = document.getElementById('container');
+        //     cont.innerHTML = '';
+        //     var div = document.createElement('div');
+        //     var errImg = document.createElement('img');
+        //     errImg.src = "https://media4.giphy.com/media/Qxkf4LQ1xIbXpH8z0I/200w.webp?cid=ecf05e47723h5jign3knrvp2m09vkhpn91e3q5r415l964nq&rid=200w.webp&ct=g"
+        // }
+
+        function displayMovie(data) {
+            var cont = document.getElementById('container');
+            cont.innerHTML = null;
+            var div1 = document.createElement('div');
+            if(data.Error== 'Movie not found!'){
+                var errImg = document.createElement('img');
+                errImg.src = "https://media4.giphy.com/media/Qxkf4LQ1xIbXpH8z0I/200w.webp?cid=ecf05e47723h5jign3knrvp2m09vkhpn91e3q5r415l964nq&rid=200w.webp&ct=g"
+                errImg.setAttribute('class', 'err-image')
+                div1.append(errImg);
+                cont.append(div1);
+            }
+            else{
+                var movieImg = document.createElement('img');
+                movieImg.src = data.Poster;
+                movieImg.setAttribute('class', 'movie-image');
+                div1.append(movieImg);
+                cont.append(div1)
+    
+                var div2 = document.createElement('div');
+                var name = document.createElement('h1');
+                name.textContent = data.Title;
+                var release = document.createElement('h3');
+                release.innerHTML = `Release Date: ${data.Released}`;
+                var director = document.createElement('h3');
+                director.textContent = `Director: ${data.Director}`
+                var writer = document.createElement('h3');
+                writer.textContent = `Writer: ${data.Writer}`
+                var moviePlot = document.createElement('p');
+                moviePlot.innerHTML = `<h3>Plot of the movie:</h3>${data.Plot}`;
+                var actor = document.createElement('p');
+                actor.textContent = `Actors: ${data.Actors}`;
+                var rating = document.createElement('p');
+                rating.textContent = `Rated By: ${data.Rated}`;
+                var runTime = document.createElement('p');
+                runTime.textContent = `Runtime: ${data.Runtime}`
+                var award = document.createElement('p');
+                award.textContent = `Awards: ${data.Awards}`
+    
+                div2.append(name, release, director, writer, moviePlot, actor, rating, runTime, award);
+                cont.append(div2)
+                console.log(data);
+            }
+        }
+    </script>
+</body>
+</html>
